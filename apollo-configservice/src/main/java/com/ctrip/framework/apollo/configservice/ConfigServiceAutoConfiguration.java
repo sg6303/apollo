@@ -68,6 +68,11 @@ public class ConfigServiceAutoConfiguration {
       this.configService = configService;
     }
 
+      /**
+       * 创建一个ReleaseMessageScanner扫描器Bean
+       * 为扫描器添加对应的监听器
+       * @return
+       */
     @Bean
     public ReleaseMessageScanner releaseMessageScanner() {
       ReleaseMessageScanner releaseMessageScanner = new ReleaseMessageScanner();

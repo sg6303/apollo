@@ -14,6 +14,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 /**
+ * 应用实例的配置信息
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity

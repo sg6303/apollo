@@ -10,6 +10,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
+/**
+ * 文件配置文本解析器，适用于 yaml、yml、json、xml 格式
+ * @author zsg
+ */
 @Component("fileTextResolver")
 public class FileTextResolver implements ConfigTextResolver {
 

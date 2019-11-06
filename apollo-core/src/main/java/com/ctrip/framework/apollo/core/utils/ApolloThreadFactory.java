@@ -25,6 +25,12 @@ public class ApolloThreadFactory implements ThreadFactory {
     return threadGroup;
   }
 
+    /**
+     * 创建线程工厂
+     * @param namePrefix
+     * @param daemon
+     * @return
+     */
   public static ThreadFactory create(String namePrefix, boolean daemon) {
     return new ApolloThreadFactory(namePrefix, daemon);
   }

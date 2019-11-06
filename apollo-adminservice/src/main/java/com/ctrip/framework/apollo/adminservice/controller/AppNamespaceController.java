@@ -34,6 +34,12 @@ public class AppNamespaceController {
     this.namespaceService = namespaceService;
   }
 
+    /**
+     *
+     * @param appNamespace
+     * @param silentCreation
+     * @return
+     */
   @PostMapping("/apps/{appId}/appnamespaces")
   public AppNamespaceDTO create(@RequestBody AppNamespaceDTO appNamespace,
                                 @RequestParam(defaultValue = "false") boolean silentCreation) {
@@ -42,6 +48,7 @@ public class AppNamespaceController {
     AppNamespace managedEntity = appNamespaceService.findOne(entity.getAppId(), entity.getName());
 
     if (managedEntity == null) {
+        //原来没有，可以创建
       if (StringUtils.isEmpty(entity.getFormat())){
         entity.setFormat(ConfigFileFormat.Properties.getValue());
       }

@@ -94,6 +94,12 @@ public class AdminServiceAPI {
                   NamespaceDTO.class, appId, clusterName, namespaceName);
     }
 
+      /**
+       * 请求admin服务创建
+       * @param env
+       * @param namespace
+       * @return
+       */
     public NamespaceDTO createNamespace(Env env, NamespaceDTO namespace) {
       return restTemplate
           .post(env, "apps/{appId}/clusters/{clusterName}/namespaces", namespace, NamespaceDTO.class,
@@ -212,6 +218,13 @@ public class AdminServiceAPI {
           appId, clusterName);
     }
 
+      /**
+       * 发请求，查看appId在env环境下集群名称是否唯一
+       * @param appId
+       * @param env
+       * @param clusterName
+       * @return
+       */
     public boolean isClusterUnique(String appId, Env env, String clusterName) {
       return restTemplate
           .get(env, "apps/{appId}/cluster/{clusterName}/unique", Boolean.class,
@@ -219,6 +232,12 @@ public class AdminServiceAPI {
 
     }
 
+      /**
+       * 发请求到env环境下的adminservice服务添加集群
+       * @param env
+       * @param cluster
+       * @return
+       */
     public ClusterDTO create(Env env, ClusterDTO cluster) {
       return restTemplate.post(env, "apps/{appId}/clusters", cluster, ClusterDTO.class,
           cluster.getAppId());
@@ -278,6 +297,18 @@ public class AdminServiceAPI {
       return releaseDTO;
     }
 
+      /**
+       * 发送请求调用adminservice创建一次发布
+       * @param appId
+       * @param env
+       * @param clusterName
+       * @param namespace
+       * @param releaseName
+       * @param releaseComment
+       * @param operator
+       * @param isEmergencyPublish 是否紧急发布
+       * @return
+       */
     public ReleaseDTO createRelease(String appId, Env env, String clusterName, String namespace,
         String releaseName, String releaseComment, String operator,
         boolean isEmergencyPublish) {

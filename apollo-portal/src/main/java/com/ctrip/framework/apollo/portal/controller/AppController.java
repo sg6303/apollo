@@ -71,6 +71,11 @@ public class AppController {
     this.roleInitializationService = roleInitializationService;
   }
 
+  /**
+   * 查找全部
+   * @param appIds
+   * @return
+   */
   @GetMapping
   public List<App> findApps(@RequestParam(value = "appIds", required = false) String appIds) {
     if (StringUtils.isEmpty(appIds)) {
@@ -80,6 +85,12 @@ public class AppController {
     }
   }
 
+  /**
+   * 按照appId或名称 搜索
+   * @param query
+   * @param pageable
+   * @return
+   */
   @GetMapping("/search")
   public PageDTO<App> searchByAppIdOrAppName(@RequestParam(value = "query", required = false) String query,
       Pageable pageable) {
@@ -110,15 +121,18 @@ public class AppController {
   @PreAuthorize(value = "@permissionValidator.hasCreateApplicationPermission()")
   @PostMapping
   public App create(@Valid @RequestBody AppModel appModel) {
-
+      //请求的json对象转为App对象
     App app = transformToApp(appModel);
 
+    //创建App应用、角色、权限一起
     App createdApp = appService.createAppInLocal(app);
 
+    //推送创建APP的一个事件
     publisher.publishEvent(new AppCreationEvent(createdApp));
 
     Set<String> admins = appModel.getAdmins();
     if (!CollectionUtils.isEmpty(admins)) {
+        //为管理员分配app的master角色
       rolePermissionService
           .assignRoleToUsers(RoleUtils.buildAppMasterRoleName(createdApp.getAppId()),
               admins, userInfoHolder.getUser().getUserId());

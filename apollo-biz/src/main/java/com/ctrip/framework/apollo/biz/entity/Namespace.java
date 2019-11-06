@@ -9,6 +9,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Namespace 是 每个 Cluster 实际拥有的 Namespace 。
+ */
 @Entity
 @Table(name = "Namespace")
 @SQLDelete(sql = "Update Namespace set isDeleted = 1 where id = ?")

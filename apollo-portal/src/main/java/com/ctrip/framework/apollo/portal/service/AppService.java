@@ -108,6 +108,11 @@ public class AppService {
     appAPI.createApp(env, appDTO);
   }
 
+  /**
+   * 创建App应用在portal本地数据库
+   * @param app
+   * @return
+   */
   @Transactional
   public App createAppInLocal(App app) {
     String appId = app.getAppId();
@@ -127,9 +132,13 @@ public class AppService {
     app.setDataChangeCreatedBy(operator);
     app.setDataChangeLastModifiedBy(operator);
 
+    //保存到portal本地数据库
     App createdApp = appRepository.save(app);
 
+    //为appId创建一个默认的命名空间
     appNamespaceService.createDefaultAppNamespace(appId);
+
+    //初始化应用角色
     roleInitializationService.initAppRoles(createdApp);
 
     Tracer.logEvent(TracerEventType.CREATE_APP, appId);

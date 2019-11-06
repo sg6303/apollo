@@ -11,6 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 /**
+ * ·¢²¼
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity
@@ -40,6 +41,9 @@ public class Release extends BaseEntity {
   @Column(name = "Comment", nullable = false)
   private String comment;
 
+    /**
+     * ÊÇ·ñ·ÏÆú
+     */
   @Column(name = "IsAbandoned", columnDefinition = "Bit default '0'")
   private boolean isAbandoned;
 

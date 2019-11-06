@@ -118,6 +118,7 @@ public class NamespaceBranchService {
   public GrayReleaseRule updateRulesReleaseId(String appId, String clusterName,
                                    String namespaceName, String branchName,
                                    long latestReleaseId, String operator) {
+      //找到旧的灰度发布规则
     GrayReleaseRule oldRules = grayReleaseRuleRepository.
         findTopByAppIdAndClusterNameAndNamespaceNameAndBranchNameOrderByIdDesc(appId, clusterName, namespaceName, branchName);
 

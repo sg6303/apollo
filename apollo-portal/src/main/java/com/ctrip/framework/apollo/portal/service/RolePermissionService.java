@@ -13,12 +13,15 @@ import java.util.Set;
 public interface RolePermissionService {
 
   /**
-   * Create role with permissions, note that role name should be unique
+   * Create role with permissions, note that role name should be unique</br>
+   * 保存角色和角色权限
    */
   public Role createRoleWithPermissions(Role role, Set<Long> permissionIds);
 
   /**
    * Assign role to users
+   *
+   * 先对userIds查询一下，已经分配权限的用户，在做差集，然后对未分配角色的用户分配角色保存数据库
    *
    * @return the users assigned roles
    */

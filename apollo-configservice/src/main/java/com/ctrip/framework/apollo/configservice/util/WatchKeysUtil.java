@@ -39,7 +39,7 @@ public class WatchKeysUtil {
   }
 
   /**
-   * Assemble watch keys for the given appId, cluster, namespaces, dataCenter combination
+   * Assemble【组装】 watch keys for the given appId, cluster, namespaces, dataCenter combination
    *
    * @return a multimap with namespace as the key and watch keys as the value
    */
@@ -86,10 +86,25 @@ public class WatchKeysUtil {
     return watchedKeysMap;
   }
 
+  /**
+   * 组装appId+cluster+namespace
+   * @param appId
+   * @param cluster
+   * @param namespace
+   * @return
+   */
   private String assembleKey(String appId, String cluster, String namespace) {
     return STRING_JOINER.join(appId, cluster, namespace);
   }
 
+  /**
+   * 拼接各种key组成set集合
+   * @param appId
+   * @param clusterName
+   * @param namespace
+   * @param dataCenter
+   * @return
+   */
   private Set<String> assembleWatchKeys(String appId, String clusterName, String namespace,
                                         String dataCenter) {
     if (ConfigConsts.NO_APPID_PLACEHOLDER.equalsIgnoreCase(appId)) {

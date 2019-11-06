@@ -16,6 +16,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 集群服务
+ */
 @Service
 public class ClusterService {
 
@@ -47,6 +50,11 @@ public class ClusterService {
     return clusterRepository.findById(clusterId).orElse(null);
   }
 
+  /**
+   * 查询appId的父集群为0的列表
+   * @param appId
+   * @return
+   */
   public List<Cluster> findParentClusters(String appId) {
     if (Strings.isNullOrEmpty(appId)) {
       return Collections.emptyList();
@@ -62,6 +70,11 @@ public class ClusterService {
     return clusters;
   }
 
+  /**
+   * 保存集群信息，并为appId的每个命名空间添加该集群
+   * @param entity
+   * @return
+   */
   @Transactional
   public Cluster saveWithInstanceOfAppNamespaces(Cluster entity) {
 
@@ -73,6 +86,11 @@ public class ClusterService {
     return savedCluster;
   }
 
+  /**
+   * 保存集群信息
+   * @param entity
+   * @return
+   */
   @Transactional
   public Cluster saveWithoutInstanceOfAppNamespaces(Cluster entity) {
     if (!isClusterNameUnique(entity.getAppId(), entity.getName())) {
@@ -87,6 +105,11 @@ public class ClusterService {
     return cluster;
   }
 
+    /**
+     * 先查询集群对象，然后删除该集群下的所有命名空间，然后在软删除集群，最后记录日志
+     * @param id
+     * @param operator
+     */
   @Transactional
   public void delete(long id, String operator) {
     Cluster cluster = clusterRepository.findById(id).orElse(null);
@@ -101,6 +124,7 @@ public class ClusterService {
     cluster.setDataChangeLastModifiedBy(operator);
     clusterRepository.save(cluster);
 
+    //记录日志
     auditService.audit(Cluster.class.getSimpleName(), id, Audit.OP.DELETE, operator);
   }
 
@@ -117,6 +141,11 @@ public class ClusterService {
     return managedCluster;
   }
 
+  /**
+   * 为appId创建默认的集群
+   * @param appId
+   * @param createBy
+   */
   @Transactional
   public void createDefaultCluster(String appId, String createBy) {
     if (!isClusterNameUnique(appId, ConfigConsts.CLUSTER_NAME_DEFAULT)) {
@@ -132,6 +161,12 @@ public class ClusterService {
     auditService.audit(Cluster.class.getSimpleName(), cluster.getId(), Audit.OP.INSERT, createBy);
   }
 
+  /**
+   * 根据appId和集群名称。查找子集群集合
+   * @param appId
+   * @param parentClusterName
+   * @return
+   */
   public List<Cluster> findChildClusters(String appId, String parentClusterName) {
     Cluster parentCluster = findOne(appId, parentClusterName);
     if (parentCluster == null) {

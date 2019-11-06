@@ -85,7 +85,17 @@ public class ItemService {
   }
 
 
+    /**
+     * 创建配置项
+     * @param appId
+     * @param env
+     * @param clusterName
+     * @param namespaceName
+     * @param item
+     * @return
+     */
   public ItemDTO createItem(String appId, Env env, String clusterName, String namespaceName, ItemDTO item) {
+      //利用命名空间名称 去admin获取命名空间对象
     NamespaceDTO namespace = namespaceAPI.loadNamespace(appId, env, clusterName, namespaceName);
     if (namespace == null) {
       throw new BadRequestException(

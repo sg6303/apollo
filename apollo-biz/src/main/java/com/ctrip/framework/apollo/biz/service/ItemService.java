@@ -54,6 +54,12 @@ public class ItemService {
     return deletedItem;
   }
 
+  /**
+   * 批量的删除指定命名空间下的所有配置项
+   * @param namespaceId
+   * @param operator
+   * @return
+   */
   @Transactional
   public int batchDelete(long namespaceId, String operator) {
     return itemRepository.deleteByNamespaceId(namespaceId, operator);

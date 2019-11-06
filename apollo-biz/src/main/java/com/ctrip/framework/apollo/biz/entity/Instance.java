@@ -13,6 +13,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 /**
+ * 使用配置的应用实例
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity

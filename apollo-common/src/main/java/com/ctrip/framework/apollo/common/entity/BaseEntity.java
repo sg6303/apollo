@@ -16,7 +16,13 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
+/**
+ * 标注为@MappedSuperclass的类将不是一个完整的实体类。它将不会映射到数据库表，但是它的属性都将映射到其子类的数据库表字段中
+ */
 @MappedSuperclass
+/**
+ * 每个类一张表
+ */
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class BaseEntity {
 
@@ -25,6 +31,9 @@ public abstract class BaseEntity {
   @Column(name = "Id")
   private long id;
 
+    /**
+     * 1: deleted, 0: normal
+     */
   @Column(name = "IsDeleted", columnDefinition = "Bit default '0'")
   protected boolean isDeleted = false;
 

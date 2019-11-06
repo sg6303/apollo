@@ -27,6 +27,13 @@ public class ClusterController {
     this.clusterService = clusterService;
   }
 
+    /**
+     * 添加集群
+     * @param appId
+     * @param autoCreatePrivateNamespace
+     * @param dto
+     * @return
+     */
   @PostMapping("/apps/{appId}/clusters")
   public ClusterDTO create(@PathVariable("appId") String appId,
                            @RequestParam(value = "autoCreatePrivateNamespace", defaultValue = "true") boolean autoCreatePrivateNamespace,
@@ -46,6 +53,12 @@ public class ClusterController {
     return BeanUtils.transform(ClusterDTO.class, entity);
   }
 
+    /**
+     * 默认的集群不可删除，然后查询要删除的集群对象，进行删除业务
+     * @param appId
+     * @param clusterName
+     * @param operator
+     */
   @DeleteMapping("/apps/{appId}/clusters/{clusterName:.+}")
   public void delete(@PathVariable("appId") String appId,
                      @PathVariable("clusterName") String clusterName, @RequestParam String operator) {
@@ -63,12 +76,23 @@ public class ClusterController {
     clusterService.delete(entity.getId(), operator);
   }
 
+    /**
+     * 根据appId查找所有父集群为0的集合列表
+     * @param appId
+     * @return
+     */
   @GetMapping("/apps/{appId}/clusters")
   public List<ClusterDTO> find(@PathVariable("appId") String appId) {
     List<Cluster> clusters = clusterService.findParentClusters(appId);
     return BeanUtils.batchTransform(ClusterDTO.class, clusters);
   }
 
+    /**
+     * 根据appId和集群名称找到指定集群对象
+     * @param appId
+     * @param clusterName
+     * @return
+     */
   @GetMapping("/apps/{appId}/clusters/{clusterName:.+}")
   public ClusterDTO get(@PathVariable("appId") String appId,
                         @PathVariable("clusterName") String clusterName) {
@@ -79,6 +103,12 @@ public class ClusterController {
     return BeanUtils.transform(ClusterDTO.class, cluster);
   }
 
+    /**
+     * 检测appId下该集群名称是否唯一
+     * @param appId
+     * @param clusterName
+     * @return
+     */
   @GetMapping("/apps/{appId}/cluster/{clusterName}/unique")
   public boolean isAppIdUnique(@PathVariable("appId") String appId,
                                @PathVariable("clusterName") String clusterName) {

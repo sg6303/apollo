@@ -50,6 +50,19 @@ public class ReleaseHistoryService {
     return releaseHistoryRepository.findByReleaseIdAndOperationInOrderByIdDesc(releaseId, operations, page);
   }
 
+    /**
+     * 创建一次发布历史记录
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param branchName
+     * @param releaseId
+     * @param previousReleaseId
+     * @param operation
+     * @param operationContext
+     * @param operator
+     * @return
+     */
   @Transactional
   public ReleaseHistory createReleaseHistory(String appId, String clusterName, String
       namespaceName, String branchName, long releaseId, long previousReleaseId, int operation,

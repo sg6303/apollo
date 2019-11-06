@@ -160,7 +160,12 @@ public class BeanUtils {
     return set;
   }
 
-
+    /**
+     * 根据字段名称 拿到 对象的熟悉字段信息
+     * @param clazz
+     * @param key
+     * @return
+     */
   private static Field deepFindField(Class<?> clazz, String key) {
     Field field = null;
     while (!clazz.getName().equals(Object.class.getName())) {

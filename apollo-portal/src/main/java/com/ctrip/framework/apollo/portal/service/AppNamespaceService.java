@@ -51,6 +51,11 @@ public class AppNamespaceService {
     return appNamespaceRepository.findByIsPublicTrue();
   }
 
+    /**
+     * 查询公共命名空间中是否有 名称为=namespaceName 的appNamespace
+     * @param namespaceName 要查询校验的命名空间
+     * @return 没有=null，找到了=返回第一个对象
+     */
   public AppNamespace findPublicAppNamespace(String namespaceName) {
     List<AppNamespace> appNamespaces = appNamespaceRepository.findByNameAndIsPublic(namespaceName, true);
 
@@ -61,6 +66,11 @@ public class AppNamespaceService {
     return appNamespaces.get(0);
   }
 
+    /**
+     * 查找名称为 namespaceName 的私有命名空间集合
+     * @param namespaceName
+     * @return
+     */
   private List<AppNamespace> findAllPrivateAppNamespaces(String namespaceName) {
     return appNamespaceRepository.findByNameAndIsPublic(namespaceName, false);
   }
@@ -73,6 +83,10 @@ public class AppNamespaceService {
     return appNamespaceRepository.findByAppId(appId);
   }
 
+  /**
+   *为appId的应用创建默认命名空间，保存到数据库
+   * @param appId
+   */
   @Transactional
   public void createDefaultAppNamespace(String appId) {
     if (!isAppNamespaceNameUnique(appId, ConfigConsts.NAMESPACE_APPLICATION)) {
@@ -91,6 +105,12 @@ public class AppNamespaceService {
     appNamespaceRepository.save(appNs);
   }
 
+  /**
+   * 查询具体的appId的命名空间是否唯一
+   * @param appId
+   * @param namespaceName
+   * @return true=唯一，false=已存在
+   */
   public boolean isAppNamespaceNameUnique(String appId, String namespaceName) {
     Objects.requireNonNull(appId, "AppId must not be null");
     Objects.requireNonNull(namespaceName, "Namespace must not be null");
@@ -101,6 +121,12 @@ public class AppNamespaceService {
     return createAppNamespaceInLocal(appNamespace, true);
   }
 
+    /**
+     * 先检验命名空间的唯一性，然后保存命名空间，并初始化修改和发布权限
+     * @param appNamespace
+     * @param appendNamespacePrefix
+     * @return
+     */
   @Transactional
   public AppNamespace createAppNamespaceInLocal(AppNamespace appNamespace, boolean appendNamespacePrefix) {
     String appId = appNamespace.getAppId();
@@ -155,9 +181,15 @@ public class AppNamespaceService {
     return createdAppNamespace;
   }
 
+    /**
+     * 检查该命名空间名称是否全局唯一，如果私有空间有的话，列出前5个的appId
+     * @param appNamespace
+     */
   private void checkAppNamespaceGlobalUniqueness(AppNamespace appNamespace) {
+      //查询公共命名空间中是否唯一
     checkPublicAppNamespaceGlobalUniqueness(appNamespace);
 
+    //查询私有命名空间中是否有 appNamespace.getName() 的命名空间集合
     List<AppNamespace> privateAppNamespaces = findAllPrivateAppNamespaces(appNamespace.getName());
 
     if (!CollectionUtils.isEmpty(privateAppNamespaces)) {
@@ -175,6 +207,10 @@ public class AppNamespaceService {
     }
   }
 
+    /**
+     * 检查公共命名空间中 名称为 appNamespace.getName() 是否唯一
+     * @param appNamespace
+     */
   private void checkPublicAppNamespaceGlobalUniqueness(AppNamespace appNamespace) {
     AppNamespace publicAppNamespace = findPublicAppNamespace(appNamespace.getName());
     if (publicAppNamespace != null) {

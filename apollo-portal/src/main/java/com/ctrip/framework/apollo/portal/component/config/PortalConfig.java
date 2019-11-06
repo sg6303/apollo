@@ -111,6 +111,7 @@ public class PortalConfig extends RefreshableConfig {
   public boolean isEmergencyPublishAllowed(Env env) {
     String targetEnv = env.name();
 
+    //可通过设置 PortalDB 的 ServerConfig 的"emergencyPublish.supported.envs" 配置开启对应的env
     String[] emergencyPublishSupportedEnvs = getArrayProperty("emergencyPublish.supported.envs", new String[0]);
 
     for (String supportedEnv : emergencyPublishSupportedEnvs) {
@@ -168,6 +169,10 @@ public class PortalConfig extends RefreshableConfig {
     return getValue("wiki.address", "https://github.com/ctripcorp/apollo/wiki");
   }
 
+    /**
+     * 是否允许项目管理员创建私有namespace
+     * @return
+     */
   public boolean canAppAdminCreatePrivateNamespace() {
     return getBooleanProperty("admin.createPrivateNamespace.switch", true);
   }

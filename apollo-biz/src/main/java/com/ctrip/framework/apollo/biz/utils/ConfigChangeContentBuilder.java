@@ -9,7 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
 
-
+/**
+ * 配置操作的builder
+ */
 public class ConfigChangeContentBuilder {
 
   private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();

@@ -9,6 +9,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * 日志审计表
+ */
 @Entity
 @Table(name = "Audit")
 @SQLDelete(sql = "Update Audit set isDeleted = 1 where id = ?")

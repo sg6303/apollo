@@ -102,7 +102,9 @@ public class NamespaceUnlockAspect {
   }
 
   boolean isModified(Namespace namespace) {
+      //查询最后一次有效的发布记录
     Release release = releaseService.findLatestActiveRelease(namespace);
+    //根据命名空间ID查找旗下的所有item集合
     List<Item> items = itemService.findItemsWithoutOrdered(namespace.getId());
 
     if (release == null) {

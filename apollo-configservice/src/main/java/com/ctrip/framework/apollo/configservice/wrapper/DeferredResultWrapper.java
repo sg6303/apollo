@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *  DeferredResult 包装器，封装 DeferredResult 的公用方法
  * @author Jason Song(song_s@ctrip.com)
  */
 public class DeferredResultWrapper implements Comparable<DeferredResultWrapper> {
@@ -28,6 +29,8 @@ public class DeferredResultWrapper implements Comparable<DeferredResultWrapper> 
     result = new DeferredResult<>(timeoutInMilli, NOT_MODIFIED_RESPONSE_LIST);
   }
 
+  //归一化( normalized )和原始( original )的 Namespace 的名字的 Map 。因为客户端在填写 Namespace 时，写错了名字的大小写。在 Config Service 中，
+  // 会进行归一化“修复”，方便逻辑的统一编写。但是，最终返回给客户端需要“还原”回原始( original )的 Namespace 的名字，避免客户端无法识别。
   public void recordNamespaceNameNormalizedResult(String originalNamespaceName, String normalizedNamespaceName) {
     if (normalizedNamespaceNameToOriginalNamespaceName == null) {
       normalizedNamespaceNameToOriginalNamespaceName = Maps.newHashMap();

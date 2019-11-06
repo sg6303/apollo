@@ -77,6 +77,15 @@ public class NamespaceAcquireLockAspect {
     acquireLock(item.getNamespaceId(), operator);
   }
 
+    /**
+     * 1.检查 一次发布只能有一个人修改开关 是否开启
+     * 2.根据名称查询命名空间对象
+     * 3.添加一条当前账户 和 这个命名空间的 锁记录
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param currentUser
+     */
   void acquireLock(String appId, String clusterName, String namespaceName,
                            String currentUser) {
     if (bizConfig.isNamespaceLockSwitchOff()) {
@@ -99,6 +108,11 @@ public class NamespaceAcquireLockAspect {
 
   }
 
+    /**
+     * 为当前账户在namespace命名空间下增加一个锁
+     * @param namespace
+     * @param currentUser
+     */
   private void acquireLock(Namespace namespace, String currentUser) {
     if (namespace == null) {
       throw new BadRequestException("namespace not exist.");
@@ -106,6 +120,7 @@ public class NamespaceAcquireLockAspect {
 
     long namespaceId = namespace.getId();
 
+    //根据命名空间id查找是否已经有锁
     NamespaceLock namespaceLock = namespaceLockService.findLock(namespaceId);
     if (namespaceLock == null) {
       try {
@@ -125,6 +140,11 @@ public class NamespaceAcquireLockAspect {
     }
   }
 
+    /**
+     * 保存一个锁，最后操作对象是 当前用户
+     * @param namespaceId
+     * @param user
+     */
   private void tryLock(long namespaceId, String user) {
     NamespaceLock lock = new NamespaceLock();
     lock.setNamespaceId(namespaceId);
@@ -133,6 +153,12 @@ public class NamespaceAcquireLockAspect {
     namespaceLockService.tryLock(lock);
   }
 
+    /**
+     * 检查命名空间的锁记录是否是当前账户
+     * @param namespace
+     * @param namespaceLock
+     * @param currentUser
+     */
   private void checkLock(Namespace namespace, NamespaceLock namespaceLock,
                          String currentUser) {
     if (namespaceLock == null) {

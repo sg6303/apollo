@@ -136,10 +136,12 @@ public class NamespaceController {
 
     for (NamespaceCreationModel model : models) {
       NamespaceDTO namespace = model.getNamespace();
+      //检查这些参数是否有为空的
       RequestPrecondition.checkArgumentsNotEmpty(model.getEnv(), namespace.getAppId(),
                                                  namespace.getClusterName(), namespace.getNamespaceName());
 
       try {
+          //只入 configDB ，没有入 portalDB库
         namespaceService.createNamespace(Env.valueOf(model.getEnv()), namespace);
       } catch (Exception e) {
         logger.error("create namespace fail.", e);
@@ -187,23 +189,39 @@ public class NamespaceController {
     return BeanUtils.transform(AppNamespaceDTO.class, appNamespace);
   }
 
+    /**
+     * 为appId创建一个命名空间
+     * 1.检查名称是否合法
+     * 2.创建命名空间
+     * 3.分配权限
+     * 4.推送创建事件给adminservice
+     * @param appId
+     * @param appendNamespacePrefix
+     * @param appNamespace
+     * @return
+     */
   @PreAuthorize(value = "@permissionValidator.hasCreateAppNamespacePermission(#appId, #appNamespace)")
   @PostMapping("/apps/{appId}/appnamespaces")
   public AppNamespace createAppNamespace(@PathVariable String appId,
       @RequestParam(defaultValue = "true") boolean appendNamespacePrefix,
       @Valid @RequestBody AppNamespace appNamespace) {
+      //检验命名空间的名称是否合法
     if (!InputValidator.isValidAppNamespace(appNamespace.getName())) {
       throw new BadRequestException(String.format("Invalid Namespace format: %s",
           InputValidator.INVALID_CLUSTER_NAMESPACE_MESSAGE + " & " + InputValidator.INVALID_NAMESPACE_NAMESPACE_MESSAGE));
     }
 
+    //创建命名空间
     AppNamespace createdAppNamespace = appNamespaceService.createAppNamespaceInLocal(appNamespace, appendNamespacePrefix);
 
     if (portalConfig.canAppAdminCreatePrivateNamespace() || createdAppNamespace.isPublic()) {
+        //如果可以允许管理员创建私有命名空间 或者 如果该创建的命名空间是公有的
+        //分配命名空间角色给操作者
       namespaceService.assignNamespaceRoleToOperator(appId, appNamespace.getName(),
           userInfoHolder.getUser().getUserId());
     }
 
+    //推送创建appNamespace的事件
     publisher.publishEvent(new AppNamespaceCreationEvent(createdAppNamespace));
 
     return createdAppNamespace;

@@ -27,6 +27,14 @@ public class CommitService {
     return commitRepository.findByAppIdAndClusterNameAndNamespaceNameOrderByIdDesc(appId, clusterName, namespaceName, page);
   }
 
+  /**
+   * 批量删除 appId的指定集群下的命名空间的提交信息
+   * @param appId
+   * @param clusterName
+   * @param namespaceName
+   * @param operator
+   * @return
+   */
   @Transactional
   public int batchDelete(String appId, String clusterName, String namespaceName, String operator){
     return commitRepository.batchDelete(appId, clusterName, namespaceName, operator);

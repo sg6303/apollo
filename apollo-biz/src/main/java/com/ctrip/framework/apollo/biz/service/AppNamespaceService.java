@@ -85,6 +85,11 @@ public class AppNamespaceService {
     return appNamespaceRepository.findByAppIdAndNameIn(appId, namespaceNames);
   }
 
+  /**
+   * 为appId创建默认的命名空间，保存操作日志
+   * @param appId
+   * @param createBy
+   */
   @Transactional
   public void createDefaultAppNamespace(String appId, String createBy) {
     if (!isAppNamespaceNameUnique(appId, ConfigConsts.NAMESPACE_APPLICATION)) {
@@ -103,8 +108,16 @@ public class AppNamespaceService {
                        createBy);
   }
 
+    /**
+     * 1.创建保存appNamespace对象
+     * 2.为appId下的所有集群创建关联到appNamespace
+     * 3.记录日志
+     * @param appNamespace
+     * @return
+     */
   @Transactional
   public AppNamespace createAppNamespace(AppNamespace appNamespace) {
+      //保存appNamespace对象到数据库
     String createBy = appNamespace.getDataChangeCreatedBy();
     if (!isAppNamespaceNameUnique(appNamespace.getAppId(), appNamespace.getName())) {
       throw new ServiceException("appnamespace not unique");
@@ -115,8 +128,10 @@ public class AppNamespaceService {
 
     appNamespace = appNamespaceRepository.save(appNamespace);
 
+    //创建该命名空间为这个appId下所有集群
     createNamespaceForAppNamespaceInAllCluster(appNamespace.getAppId(), appNamespace.getName(), createBy);
 
+    //记录日志
     auditService.audit(AppNamespace.class.getSimpleName(), appNamespace.getId(), Audit.OP.INSERT, createBy);
     return appNamespace;
   }
@@ -132,6 +147,12 @@ public class AppNamespaceService {
     return managedNs;
   }
 
+    /**
+     * 创建命名空间为appId的所有集群
+     * @param appId
+     * @param namespaceName
+     * @param createBy
+     */
   public void createNamespaceForAppNamespaceInAllCluster(String appId, String namespaceName, String createBy) {
     List<Cluster> clusters = clusterService.findParentClusters(appId);
 

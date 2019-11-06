@@ -39,6 +39,15 @@ public class ItemController {
     this.commitService = commitService;
   }
 
+    /**
+     * 1.创建配置项 保存到 item库
+     * 2.同时保存一条 commit记录
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param dto
+     * @return
+     */
   @PreAcquireNamespaceLock
   @PostMapping("/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/items")
   public ItemDTO create(@PathVariable("appId") String appId,

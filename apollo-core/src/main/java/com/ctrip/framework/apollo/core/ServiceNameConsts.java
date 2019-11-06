@@ -1,5 +1,8 @@
 package com.ctrip.framework.apollo.core;
 
+/**
+ * ·þÎñÃû³Æ
+ */
 public interface ServiceNameConsts {
 
   String APOLLO_METASERVICE = "apollo-metaservice";

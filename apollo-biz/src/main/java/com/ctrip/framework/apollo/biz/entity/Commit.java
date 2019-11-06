@@ -10,12 +10,18 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+/**
+ * commit 历史表
+ */
 @Entity
 @Table(name = "Commit")
 @SQLDelete(sql = "Update Commit set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class Commit extends BaseEntity {
 
+    /**
+     * 修改变更集
+     */
   @Lob
   @Column(name = "ChangeSets", nullable = false)
   private String changeSets;

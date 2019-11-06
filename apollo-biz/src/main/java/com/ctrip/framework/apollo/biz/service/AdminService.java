@@ -32,6 +32,11 @@ public class AdminService {
     this.namespaceService = namespaceService;
   }
 
+    /**
+     * 创建新的app
+     * @param app
+     * @return
+     */
   @Transactional
   public App createNewApp(App app) {
     String createBy = app.getDataChangeCreatedBy();
@@ -39,10 +44,13 @@ public class AdminService {
 
     String appId = createdApp.getAppId();
 
+    //创建默认的命名空间
     appNamespaceService.createDefaultAppNamespace(appId, createBy);
 
+    //创建默认的集群
     clusterService.createDefaultCluster(appId, createBy);
 
+    //为appId的所有命名空间创建默认集群
     namespaceService.instanceOfAppNamespaces(appId, ConfigConsts.CLUSTER_NAME_DEFAULT, createBy);
 
     return app;

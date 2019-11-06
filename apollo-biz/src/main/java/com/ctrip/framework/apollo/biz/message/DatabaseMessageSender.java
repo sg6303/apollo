@@ -43,6 +43,8 @@ public class DatabaseMessageSender implements MessageSender {
   @Transactional
   public void sendMessage(String message, String channel) {
     logger.info("Sending message {} to channel {}", message, channel);
+
+    // 仅允许发送 APOLLO_RELEASE_TOPIC
     if (!Objects.equals(channel, Topics.APOLLO_RELEASE_TOPIC)) {
       logger.warn("Channel {} not supported by DatabaseMessageSender!");
       return;
@@ -52,6 +54,8 @@ public class DatabaseMessageSender implements MessageSender {
     Transaction transaction = Tracer.newTransaction("Apollo.AdminService", "sendMessage");
     try {
       ReleaseMessage newMessage = releaseMessageRepository.save(new ReleaseMessage(message));
+
+      // 添加到清理 Message 队列。若队列已满，添加失败，不阻塞等待。
       toClean.offer(newMessage.getId());
       transaction.setStatus(Transaction.SUCCESS);
     } catch (Throwable ex) {
@@ -66,9 +70,12 @@ public class DatabaseMessageSender implements MessageSender {
   @PostConstruct
   private void initialize() {
     cleanExecutorService.submit(() -> {
+        // 若未停止，持续运行。
       while (!cleanStopped.get() && !Thread.currentThread().isInterrupted()) {
         try {
+            //拉取
           Long rm = toClean.poll(1, TimeUnit.SECONDS);
+          // 队列非空，处理拉取到的消息
           if (rm != null) {
             cleanMessage(rm);
           } else {
@@ -84,11 +91,15 @@ public class DatabaseMessageSender implements MessageSender {
   private void cleanMessage(Long id) {
     boolean hasMore = true;
     //double check in case the release message is rolled back
+    // 查询对应的 ReleaseMessage 对象，避免已经删除。因为，DatabaseMessageSender 会在多进程中执行。例如：1）Config Service + Admin Service ；
+    // 2）N * Config Service ；3）N * Admin Service
     ReleaseMessage releaseMessage = releaseMessageRepository.findById(id).orElse(null);
     if (releaseMessage == null) {
       return;
     }
     while (hasMore && !Thread.currentThread().isInterrupted()) {
+      // 拉取相同消息内容的 100 条的老消息
+      // 老消息的定义：比当前消息编号小，即先发送的
       List<ReleaseMessage> messages = releaseMessageRepository.findFirst100ByMessageAndIdLessThanOrderByIdAsc(
           releaseMessage.getMessage(), releaseMessage.getId());
 

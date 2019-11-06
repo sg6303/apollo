@@ -48,7 +48,7 @@ public class PropertyResolver implements ConfigTextResolver {
       newLineNumMapItem.put(lineCounter, newItem);
       ItemDTO oldItemByLine = oldLineNumMapItem.get(lineCounter);
 
-      //comment item
+      //comment item 注释的
       if (isCommentItem(newItem)) {
 
         handleCommentLine(namespaceId, oldItemByLine, newItem, lineCounter, changeSets);
@@ -72,12 +72,18 @@ public class PropertyResolver implements ConfigTextResolver {
     return changeSets;
   }
 
+    /**
+     * 校验是否存在重复配置 Key
+     * @param newItems
+     * @return
+     */
   private boolean isHasRepeatKey(String[] newItems) {
     Set<String> keys = new HashSet<>();
     int lineCounter = 1;
     int keyCount = 0;
     for (String item : newItems) {
       if (!isCommentItem(item) && !isBlankItem(item)) {
+          //不是注释部分 且 不为空
         keyCount++;
         String[] kv = parseKeyValueFromItem(item);
         if (kv != null) {
@@ -92,6 +98,13 @@ public class PropertyResolver implements ConfigTextResolver {
     return keyCount > keys.size();
   }
 
+    /**
+     * 将配置项变成数组
+     * aa=bb
+     * 变成 [aa,bb]
+     * @param item
+     * @return
+     */
   private String[] parseKeyValueFromItem(String item) {
     int kvSeparator = item.indexOf(KV_SEPARATOR);
     if (kvSeparator == -1) {
@@ -108,6 +121,7 @@ public class PropertyResolver implements ConfigTextResolver {
     String oldComment = oldItemByLine == null ? "" : oldItemByLine.getComment();
     //create comment. implement update comment by delete old comment and create new comment
     if (!(isCommentItem(oldItemByLine) && newItem.equals(oldComment))) {
+        //创建注释 ItemDTO 到 ItemChangeSets 的新增项，若老的配置项不是注释或者不相等。另外，更新注释配置，通过删除 + 添加的方式。
       changeSets.addCreateItem(buildCommentItem(0l, namespaceId, newItem, lineCounter));
     }
   }

@@ -86,6 +86,10 @@ public class BizConfig extends RefreshableConfig {
     return namespaceValueLengthOverride;
   }
 
+    /**
+     * 判断 一次发布只能有一个人修改开关
+     * @return
+     */
   public boolean isNamespaceLockSwitchOff() {
     return !getBooleanProperty("namespace.lock.switch", false);
   }

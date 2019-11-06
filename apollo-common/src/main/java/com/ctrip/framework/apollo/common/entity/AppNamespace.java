@@ -13,6 +13,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * AppNamespace 是 App 下的每个 Cluster 默认创建的 Namespace 。
+ */
 @Entity
 @Table(name = "AppNamespace")
 @SQLDelete(sql = "Update AppNamespace set isDeleted = 1 where id = ?")
@@ -31,6 +34,9 @@ public class AppNamespace extends BaseEntity {
   @Column(name = "AppId", nullable = false)
   private String appId;
 
+    /**
+     * 格式 参考 ConfigFileFormat 类
+     */
   @Column(name = "Format", nullable = false)
   private String format;
 

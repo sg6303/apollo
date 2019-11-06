@@ -9,6 +9,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * 灰度规则表
+ */
 @Entity
 @Table(name = "GrayReleaseRule")
 @SQLDelete(sql = "Update GrayReleaseRule set isDeleted = 1 where id = ?")
@@ -30,9 +33,15 @@ public class GrayReleaseRule extends BaseEntity{
   @Column(name = "Rules")
   private String rules;
 
+    /**
+     * 灰度对应的release
+     */
   @Column(name = "releaseId", nullable = false)
   private Long releaseId;
 
+    /**
+     * 灰度分支状态: 0:删除分支,1:正在使用的规则 2：全量发布
+     */
   @Column(name = "BranchStatus", nullable = false)
   private int branchStatus;
 

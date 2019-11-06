@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
+ * 配置服务自身配置
  * @author Jason Song(song_s@ctrip.com)
  */
 @Entity

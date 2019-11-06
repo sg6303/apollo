@@ -33,6 +33,11 @@ public class AppController {
     this.adminService = adminService;
   }
 
+  /**
+   * admin服务添加app信息，一般由portal发起rest的post请求
+   * @param dto
+   * @return
+   */
   @PostMapping("/apps")
   public AppDTO create(@Valid @RequestBody AppDTO dto) {
     App entity = BeanUtils.transform(App.class, dto);

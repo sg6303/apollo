@@ -83,6 +83,13 @@ public class NamespaceService {
     return namespaceRepository.findById(namespaceId).orElse(null);
   }
 
+    /**
+     * 根据appId、集群名称、命名空间名称 查找命名空间
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @return
+     */
   public Namespace findOne(String appId, String clusterName, String namespaceName) {
     return namespaceRepository.findByAppIdAndClusterNameAndNamespaceName(appId, clusterName,
                                                                          namespaceName);
@@ -179,6 +186,12 @@ public class NamespaceService {
     return namespaceRepository.countByNamespaceNameAndAppIdNot(publicNamespaceName, publicAppNamespace.getAppId());
   }
 
+    /**
+     * 根据appId和集群名称查询命名空间集合
+     * @param appId
+     * @param clusterName
+     * @return
+     */
   public List<Namespace> findNamespaces(String appId, String clusterName) {
     List<Namespace> namespaces = namespaceRepository.findByAppIdAndClusterNameOrderByIdAsc(appId, clusterName);
     if (namespaces == null) {
@@ -191,6 +204,13 @@ public class NamespaceService {
     return namespaceRepository.findByAppIdAndNamespaceNameOrderByIdAsc(appId, namespaceName);
   }
 
+  /**
+   * 查找parentClusterName的子集群且命名空间是namespaceName的记录对象
+   * @param appId
+   * @param parentClusterName
+   * @param namespaceName
+   * @return
+   */
   public Namespace findChildNamespace(String appId, String parentClusterName, String namespaceName) {
     List<Namespace> namespaces = findByAppIdAndNamespaceName(appId, namespaceName);
     if (CollectionUtils.isEmpty(namespaces) || namespaces.size() == 1) {
@@ -255,6 +275,12 @@ public class NamespaceService {
         namespaceRepository.findByAppIdAndClusterNameAndNamespaceName(appId, cluster, namespace));
   }
 
+    /**
+     * 先找到appId和集群名称下的所有命名空间，然后遍历删除每个命名空间
+     * @param appId
+     * @param clusterName
+     * @param operator
+     */
   @Transactional
   public void deleteByAppIdAndClusterName(String appId, String clusterName, String operator) {
 
@@ -267,18 +293,28 @@ public class NamespaceService {
     }
   }
 
+    /**
+     * TODO:删除命名空间。=== 比较复杂的业务
+     * @param namespace
+     * @param operator
+     * @return
+     */
   @Transactional
   public Namespace deleteNamespace(Namespace namespace, String operator) {
     String appId = namespace.getAppId();
     String clusterName = namespace.getClusterName();
     String namespaceName = namespace.getNamespaceName();
 
+    //配置项的批量删除
     itemService.batchDelete(namespace.getId(), operator);
+
+    //提交记录的批量删除
     commitService.batchDelete(appId, clusterName, namespace.getNamespaceName(), operator);
 
     // Child namespace releases should retain as long as the parent namespace exists, because parent namespaces' release
     // histories need them
     if (!isChildNamespace(namespace)) {
+      //发布的批量删除
       releaseService.batchDelete(appId, clusterName, namespace.getNamespaceName(), operator);
     }
 
@@ -311,6 +347,11 @@ public class NamespaceService {
     return deleted;
   }
 
+    /**
+     * 保存，记录日志
+     * @param entity
+     * @return
+     */
   @Transactional
   public Namespace save(Namespace entity) {
     if (!isNamespaceUnique(entity.getAppId(), entity.getClusterName(), entity.getNamespaceName())) {
@@ -338,6 +379,12 @@ public class NamespaceService {
     return managedNamespace;
   }
 
+  /**
+   * 为appId的所有命名空间都创建指定集群，并保存每条日志信息
+   * @param appId
+   * @param clusterName
+   * @param createBy
+   */
   @Transactional
   public void instanceOfAppNamespaces(String appId, String clusterName, String createBy) {
 

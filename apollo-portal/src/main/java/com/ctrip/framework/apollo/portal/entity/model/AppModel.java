@@ -27,6 +27,7 @@ public class AppModel {
   @NotBlank(message = "ownerName cannot be blank")
   private String ownerName;
 
+  //应用的管理员集合
   private Set<String> admins;
 
   public String getName() {

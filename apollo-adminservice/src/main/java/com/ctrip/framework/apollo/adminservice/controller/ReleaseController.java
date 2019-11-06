@@ -98,6 +98,17 @@ public class ReleaseController {
     return BeanUtils.transform(ReleaseDTO.class, release);
   }
 
+    /**
+     * 创建一次发布
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param releaseName
+     * @param releaseComment
+     * @param operator
+     * @param isEmergencyPublish
+     * @return
+     */
   @Transactional
   @PostMapping("/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases")
   public ReleaseDTO publish(@PathVariable("appId") String appId,
@@ -112,6 +123,8 @@ public class ReleaseController {
       throw new NotFoundException(String.format("Could not find namespace for %s %s %s", appId,
                                                 clusterName, namespaceName));
     }
+
+    // 发布 Namespace 的配置
     Release release = releaseService.publish(namespace, releaseName, releaseComment, operator, isEmergencyPublish);
 
     //send release message
@@ -122,6 +135,8 @@ public class ReleaseController {
     } else {
       messageCluster = clusterName;
     }
+
+    //发送发布消息
     messageSender.sendMessage(ReleaseMessageKeyGenerator.generate(appId, messageCluster, namespaceName),
                               Topics.APOLLO_RELEASE_TOPIC);
     return BeanUtils.transform(ReleaseDTO.class, release);

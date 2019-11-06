@@ -41,17 +41,21 @@ public class ItemSetService {
     String operator = changeSet.getDataChangeLastModifiedBy();
     ConfigChangeContentBuilder configChangeContentBuilder = new ConfigChangeContentBuilder();
 
+    //新增
     if (!CollectionUtils.isEmpty(changeSet.getCreateItems())) {
       for (ItemDTO item : changeSet.getCreateItems()) {
         Item entity = BeanUtils.transform(Item.class, item);
         entity.setDataChangeCreatedBy(operator);
         entity.setDataChangeLastModifiedBy(operator);
+
+        //这里采用的是在for循环里面执行对数据库的保存，好像不好
         Item createdItem = itemService.save(entity);
         configChangeContentBuilder.createItem(createdItem);
       }
       auditService.audit("ItemSet", null, Audit.OP.INSERT, operator);
     }
 
+    //更新
     if (!CollectionUtils.isEmpty(changeSet.getUpdateItems())) {
       for (ItemDTO item : changeSet.getUpdateItems()) {
         Item entity = BeanUtils.transform(Item.class, item);
@@ -75,6 +79,7 @@ public class ItemSetService {
       auditService.audit("ItemSet", null, Audit.OP.UPDATE, operator);
     }
 
+    //删除
     if (!CollectionUtils.isEmpty(changeSet.getDeleteItems())) {
       for (ItemDTO item : changeSet.getDeleteItems()) {
         Item deletedItem = itemService.delete(item.getId(), operator);

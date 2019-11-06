@@ -29,6 +29,11 @@ public class AppService {
     return Objects.isNull(appRepository.findByAppId(appId));
   }
 
+  /**
+   * 检查该id是否存在app表中，如果存在，则直接更新软删除。并保存操作日志
+   * @param id
+   * @param operator
+   */
   @Transactional
   public void delete(long id, String operator) {
     App app = appRepository.findById(id).orElse(null);
@@ -56,11 +61,17 @@ public class AppService {
     return appRepository.findByAppId(appId);
   }
 
+  /**
+   * 先检查appid是否已经存在，如果不存在，则直接保存对象，然后保存操作日志信息
+   * @param entity
+   * @return 保存好的app对象信息
+   */
   @Transactional
   public App save(App entity) {
     if (!isAppIdUnique(entity.getAppId())) {
       throw new ServiceException("appId not unique");
     }
+    //保护代码，避免 App 对象中，已经有 id 属性。
     entity.setId(0);//protection
     App app = appRepository.save(entity);
 

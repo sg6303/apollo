@@ -20,6 +20,7 @@ import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.google.common.collect.Lists;
 
 /**
+ *  ReleaseMessage 扫描器，被 Config Service 使用
  * @author Jason Song(song_s@ctrip.com)
  */
 public class ReleaseMessageScanner implements InitializingBean {
@@ -41,11 +42,16 @@ public class ReleaseMessageScanner implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
+    // 从 ServerConfig 中获得扫描频率 单位：毫秒
     databaseScanInterval = bizConfig.releaseMessageScanIntervalInMilli();
+    //拿到最大的发布消息编号
     maxIdScanned = loadLargestMessageId();
+
+    // 创建从 DB 中扫描 ReleaseMessage 表的定时任务
     executorService.scheduleWithFixedDelay((Runnable) () -> {
       Transaction transaction = Tracer.newTransaction("Apollo.ReleaseMessageScanner", "scanMessage");
       try {
+          //循环扫描消息
         scanMessages();
         transaction.setStatus(Transaction.SUCCESS);
       } catch (Throwable ex) {
@@ -73,6 +79,7 @@ public class ReleaseMessageScanner implements InitializingBean {
    */
   private void scanMessages() {
     boolean hasMoreMessages = true;
+    //循环扫描消息，直到没有新的 ReleaseMessage 为止
     while (hasMoreMessages && !Thread.currentThread().isInterrupted()) {
       hasMoreMessages = scanAndSendMessages();
     }
@@ -90,8 +97,12 @@ public class ReleaseMessageScanner implements InitializingBean {
     if (CollectionUtils.isEmpty(releaseMessages)) {
       return false;
     }
+
+    //触发监听器
     fireMessageScanned(releaseMessages);
+
     int messageScanned = releaseMessages.size();
+    //重置最大消息处理的ID
     maxIdScanned = releaseMessages.get(messageScanned - 1).getId();
     return messageScanned == 500;
   }
@@ -113,6 +124,7 @@ public class ReleaseMessageScanner implements InitializingBean {
     for (ReleaseMessage message : messages) {
       for (ReleaseMessageListener listener : listeners) {
         try {
+            //每条消息的每个监听器不同的处理
           listener.handleMessage(message, Topics.APOLLO_RELEASE_TOPIC);
         } catch (Throwable ex) {
           Tracer.logError(ex);

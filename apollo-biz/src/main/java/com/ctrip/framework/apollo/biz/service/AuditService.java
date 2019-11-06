@@ -24,6 +24,13 @@ public class AuditService {
     return auditRepository.findAudits(owner, entity, op);
   }
 
+  /**
+   * 保存操作日志到audit的操作日志表中
+   * @param entityName
+   * @param entityId
+   * @param op
+   * @param owner
+   */
   @Transactional
   void audit(String entityName, Long entityId, Audit.OP op, String owner) {
     Audit audit = new Audit();
