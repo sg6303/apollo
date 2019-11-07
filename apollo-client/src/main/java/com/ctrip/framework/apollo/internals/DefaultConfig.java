@@ -1,7 +1,6 @@
 package com.ctrip.framework.apollo.internals;
 
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
-import com.ctrip.framework.apollo.util.AesUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -150,29 +149,6 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
   }
 
   private void updateConfig(Properties newConfigProperties, ConfigSourceType sourceType) {
-    //start get password
-    String passwd = newConfigProperties.getProperty("jasypt.encryptor.password");
-    String recoverPasswd = new StringBuilder(passwd).reverse().toString();
-
-    //foreach every value start Enc
-    Set<Object> keys = newConfigProperties.keySet();
-    for (Object k : keys) {
-      String key = k.toString();
-      String value = newConfigProperties.getProperty(key);
-      // 加密Value
-      if (value.startsWith("ENC(") && value.endsWith(")")) {
-        logger.debug("加密Value {}", value);
-        // 解密然后重新赋值
-        try {
-          String decryptValue = AesUtils.decrypt(value.substring(4, value.length()-1),recoverPasswd);
-          newConfigProperties.setProperty(key, "ENC("+decryptValue+")");
-        } catch (Exception e) {
-          logger.error("加密配置解密失败", e);
-        }
-      }
-    }
-
-    //重新组装到 apollo 里面
     m_configProperties.set(newConfigProperties);
     m_sourceType = sourceType;
   }
