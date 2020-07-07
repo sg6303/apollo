@@ -1,26 +1,8 @@
 package com.ctrip.framework.apollo.portal.api;
 
-
-import com.ctrip.framework.apollo.common.dto.AppDTO;
-import com.ctrip.framework.apollo.common.dto.AppNamespaceDTO;
-import com.ctrip.framework.apollo.common.dto.ClusterDTO;
-import com.ctrip.framework.apollo.common.dto.CommitDTO;
-import com.ctrip.framework.apollo.common.dto.GrayReleaseRuleDTO;
-import com.ctrip.framework.apollo.common.dto.InstanceDTO;
-import com.ctrip.framework.apollo.common.dto.ItemChangeSets;
-import com.ctrip.framework.apollo.common.dto.ItemDTO;
-import com.ctrip.framework.apollo.common.dto.NamespaceDTO;
-import com.ctrip.framework.apollo.common.dto.NamespaceLockDTO;
-import com.ctrip.framework.apollo.common.dto.PageDTO;
-import com.ctrip.framework.apollo.common.dto.ReleaseDTO;
-import com.ctrip.framework.apollo.common.dto.ReleaseHistoryDTO;
-import com.ctrip.framework.apollo.core.enums.Env;
+import com.ctrip.framework.apollo.common.dto.*;
+import com.ctrip.framework.apollo.portal.environment.Env;
 import com.google.common.base.Joiner;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -31,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.util.*;
 
 
 @Service
@@ -231,6 +215,36 @@ public class AdminServiceAPI {
   }
 
   @Service
+  public static class AccessKeyAPI extends API {
+
+    public AccessKeyDTO create(Env env, AccessKeyDTO accessKey) {
+      return restTemplate.post(env, "apps/{appId}/accesskeys",
+          accessKey, AccessKeyDTO.class, accessKey.getAppId());
+    }
+
+    public List<AccessKeyDTO> findByAppId(Env env, String appId) {
+      AccessKeyDTO[] accessKeys = restTemplate.get(env, "apps/{appId}/accesskeys",
+          AccessKeyDTO[].class, appId);
+      return Arrays.asList(accessKeys);
+    }
+
+    public void delete(Env env, String appId, long id, String operator) {
+      restTemplate.delete(env, "apps/{appId}/accesskeys/{id}?operator={operator}",
+          appId, id, operator);
+    }
+
+    public void enable(Env env, String appId, long id, String operator) {
+      restTemplate.put(env, "apps/{appId}/accesskeys/{id}/enable?operator={operator}",
+          null, appId, id, operator);
+    }
+
+    public void disable(Env env, String appId, long id, String operator) {
+      restTemplate.put(env, "apps/{appId}/accesskeys/{id}/disable?operator={operator}",
+          null, appId, id, operator);
+    }
+  }
+
+  @Service
   public static class ReleaseAPI extends API {
 
     private static final Joiner JOINER = Joiner.on(",");
@@ -332,6 +346,12 @@ public class AdminServiceAPI {
       restTemplate.put(env,
           "releases/{releaseId}/rollback?operator={operator}",
           null, releaseId, operator);
+    }
+
+    public void rollbackTo(Env env, long releaseId, long toReleaseId, String operator) {
+      restTemplate.put(env,
+              "releases/{releaseId}/rollback?toReleaseId={toReleaseId}&operator={operator}",
+              null, releaseId, toReleaseId, operator);
     }
   }
 

@@ -5,7 +5,8 @@
 
         <div class="row">
             <div class="col-md-6 col-sm-6 header-namespace">
-                <b class="namespace-name" ng-bind="namespace.viewName"></b>
+                <b class="namespace-name" ng-bind="namespace.viewName"
+                   data-tooltip="tooltip" data-placement="bottom" title="{{namespace.comment}}"></b>
                 <span class="label label-warning no-radius namespace-label"
                     ng-show="namespace.branch.itemModifiedCnt > 0">{{'Component.Namespace.Branch.IsChanged' | translate }}
                     <span class="badge label badge-white namespace-label"
@@ -364,7 +365,7 @@
                     <button class="btn btn-default btn-sm" data-tooltip="tooltip" data-placement="bottom"
                         title="{{'Component.Namespace.Branch.Instance.RefreshList' | translate }}"
                         ng-click="refreshInstancesInfo(namespace.branch)">
-                        <img src="../../img/refresh.png" />
+                        <img ng-src="{{ '/img/refresh.png' | prefixPath }}" />
                     </button>
                 </div>
                 <div class="panel-body">
@@ -372,7 +373,7 @@
                         <div class="panel-heading">
                             <a target="_blank" data-tooltip="tooltip" data-placement="bottom"
                                 title="{{'Component.Namespace.Branch.Instance.ItemToSee' | translate }}"
-                                href="/config/history.html?#/appid={{appId}}&env={{env}}&clusterName={{namespace.baseInfo.clusterName}}&namespaceName={{namespace.baseInfo.namespaceName}}&releaseId={{namespace.branch.latestRelease.id}}">
+                                ng-href="{{ '/config/history.html' | prefixPath }}?#/appid={{appId}}&env={{env}}&clusterName={{namespace.baseInfo.clusterName}}&namespaceName={{namespace.baseInfo.namespaceName}}&releaseId={{namespace.branch.latestRelease.id}}">
                                 {{namespace.branch.latestRelease.name}}
                             </a>
                         </div>
